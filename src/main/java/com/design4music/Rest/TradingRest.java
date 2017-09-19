@@ -23,6 +23,12 @@ public class TradingRest {
 		this.service = service;
 	}
 
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public ResponseEntity<List<TradeItem>> getTrades() {
+		List<TradeItem> items = service.getAllTrades();
+		return new ResponseEntity<List<TradeItem>>(items, HttpStatus.OK);
+	}
+
 	@RequestMapping(value = "item", method = RequestMethod.GET)
 	public ResponseEntity<TradeItem> getTradeItem(@RequestParam("id") long id) {
 		TradeItem item = service.getTradeItem(id);

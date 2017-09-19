@@ -14,4 +14,6 @@ public interface IAccountDao {
 	List<Account> getAllAccounts();
 
 	Account createAccount();
+
+	Account createAccount(long id);
 }

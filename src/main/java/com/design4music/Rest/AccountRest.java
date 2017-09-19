@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * Created by Nekkyou on 19-9-2017.
  */
@@ -23,6 +25,12 @@ public class AccountRest {
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public ResponseEntity<List<Account>> getAccounts() {
+		List<Account> accounts = service.getAllAccounts();
+		return new ResponseEntity<List<Account>>(accounts, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/get", method = RequestMethod.GET)
 	public ResponseEntity<Account> getAccount(@RequestParam("id") long id) {
 		Account a = service.getAccount(id);
 		return new ResponseEntity<Account>(a, HttpStatus.OK);

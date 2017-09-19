@@ -38,4 +38,8 @@ public class AccountService {
 	public Account createAccount() {
 		return accountDao.createAccount();
 	}
+
+	public Account createAccount(long id) {
+		return accountDao.createAccount(id);
+	}
 }

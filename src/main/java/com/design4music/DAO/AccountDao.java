@@ -34,8 +34,38 @@ public class AccountDao implements IAccountDao {
 
 	@Override
 	public Account createAccount() {
-		Account account = new Account(accounts.size());
+		Account account = new Account(getNextAccountId());
 		accounts.add(account);
 		return account;
+	}
+
+	@Override
+	public Account createAccount(long id) {
+		//Check if account already exists.
+		for(Account a: accounts) {
+			if (a.getId() == id) {
+				throw new IllegalArgumentException("id already exists");
+			}
+		}
+
+		//Create the account
+		Account account = new Account(id);
+		accounts.add(account);
+		return account;
+	}
+
+
+	/**
+	 * Get a new ID for a new account
+	 * @return The highest id + 1.
+	 */
+	private long getNextAccountId() {
+		long highest = 0;
+		for(Account a: accounts) {
+			if (a.getId() >= highest) {
+				highest = a.getId() + 1;
+			}
+		}
+		return highest;
 	}
 }
