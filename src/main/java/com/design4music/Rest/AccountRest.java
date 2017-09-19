@@ -2,7 +2,7 @@ package com.design4music.Rest;
 
 import com.design4music.Domain.Account;
 import com.design4music.Service.AccountService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,18 +24,21 @@ public class AccountRest {
 		this.service = service;
 	}
 
+	@ApiOperation(value = "getAccounts", notes = "Get all the accounts")
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public ResponseEntity<List<Account>> getAccounts() {
 		List<Account> accounts = service.getAllAccounts();
 		return new ResponseEntity<List<Account>>(accounts, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "getAccount", notes = "Get a single Account by id")
 	@RequestMapping(value = "/get", method = RequestMethod.GET)
 	public ResponseEntity<Account> getAccount(@RequestParam("id") long id) {
 		Account a = service.getAccount(id);
 		return new ResponseEntity<Account>(a, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "createAccount", notes = "Create an Account")
 	@RequestMapping(value = "create", method = RequestMethod.POST)
 	public ResponseEntity<Account> createAccount() {
 		Account account = service.createAccount();

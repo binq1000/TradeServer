@@ -2,6 +2,9 @@ package com.design4music.Rest;
 
 import com.design4music.Domain.TradeItem;
 import com.design4music.Service.TradingService;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,18 +26,30 @@ public class TradingRest {
 		this.service = service;
 	}
 
+	@ApiOperation(value = "getTrades", notes = "Get all the trades that have yet to get a response")
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public ResponseEntity<List<TradeItem>> getTrades() {
 		List<TradeItem> items = service.getAllTrades();
 		return new ResponseEntity<List<TradeItem>>(items, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "getTradeItem", notes = "Get a single TradeItem by id")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "id", value = "TradeItem's Id")
+	})
 	@RequestMapping(value = "item", method = RequestMethod.GET)
 	public ResponseEntity<TradeItem> getTradeItem(@RequestParam("id") long id) {
 		TradeItem item = service.getTradeItem(id);
 		return new ResponseEntity<TradeItem>(item, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "createTradeItem", notes = "Create a TradeItem with the parameters")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "accountId", value = "Proposer's Id"),
+			@ApiImplicitParam(name = "flippoId", value = "Proposer's offered flippo Id"),
+			@ApiImplicitParam(name = "otheraccId", value = "Receiver's Id"),
+			@ApiImplicitParam(name = "otherflippoId", value = "Receiver's wanted flippo Id")
+	})
 	@RequestMapping(value = "create", method = RequestMethod.POST)
 	public ResponseEntity<TradeItem> createTradeItem(@RequestParam("accountId") long accId,
 													 @RequestParam("flippoId") long flippoId,
@@ -44,30 +59,51 @@ public class TradingRest {
 		return new ResponseEntity<TradeItem>(item, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "getTradesFromAccount", notes = "Get all trades that the account is the proposer for.")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "id", value = "Proposer's Id")
+	})
 	@RequestMapping(value = "out", method = RequestMethod.GET)
 	public ResponseEntity<List<TradeItem>> getTradesFromAccount(@RequestParam("id") long accountId) {
 		List<TradeItem> items = service.getTradesFromAccount(accountId);
 		return new ResponseEntity<List<TradeItem>>(items, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "getTradesForAccount", notes = "Get all trades that the account is the receiver for.")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "id", value = "Receiver's Id")
+	})
 	@RequestMapping(value = "in", method = RequestMethod.GET)
 	public ResponseEntity<List<TradeItem>> getTradesForAccount(@RequestParam("id") long accountId) {
 		List<TradeItem> items = service.getTradesForAccount(accountId);
 		return new ResponseEntity<List<TradeItem>>(items, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "getAllUnhandledAcceptedTrades", notes = "Get all the trades that you are the proposer for that have been accepted.")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "id", value = "Proposer's Id")
+	})
 	@RequestMapping(value = "accepted", method = RequestMethod.GET)
 	public ResponseEntity<List<TradeItem>> getAllUnhandledAcceptedTrades(@RequestParam("id") long accountId) {
 		List<TradeItem> items = service.getUnhandledAcceptedTrades(accountId);
 		return new ResponseEntity<List<TradeItem>>(items, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "getDeclinedTrades", notes = "Get all trades that you are the proposer for that have been declined")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "id", value = "Proposer's Id")
+	})
 	@RequestMapping(value = "declined", method = RequestMethod.GET)
 	public ResponseEntity<List<TradeItem>> getDeclinedTrades(@RequestParam("id") long accountId) {
 		List<TradeItem> items = service.getDeclinesTrades(accountId);
 		return new ResponseEntity<List<TradeItem>>(items, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "respondToTrade", notes = "Respond to a trade")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "tradeId", value = "TradeItem's Id"),
+			@ApiImplicitParam(name = "response", value = "Accepted/Declined")
+	})
 	@RequestMapping(value = "respond", method = RequestMethod.POST)
 	public void respondToTrade(@RequestParam("tradeId") long tradeId,
 								@RequestParam("reponse") boolean response) {
