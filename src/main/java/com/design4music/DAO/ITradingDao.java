@@ -57,6 +57,8 @@ public interface ITradingDao {
 	 */
 	List<TradeItem> getUnhandledAcceptedTrades(long accountId);
 
+	List<TradeItem> getAllTradeResponses(long accountId);
+
 	/**
 	 * Get all declined trades from an account.
 	 * @param accountId The proposer.

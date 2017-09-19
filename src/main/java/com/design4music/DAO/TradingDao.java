@@ -88,6 +88,23 @@ public class TradingDao implements ITradingDao{
 	}
 
 	@Override
+	public List<TradeItem> getAllTradeResponses(long accountId) {
+		List<TradeItem> items = new ArrayList<>();
+		for(TradeItem t: declinedTrades) {
+			if (t.getProposer().getId() == accountId || t.getReciever().getId() == accountId) {
+				items.add(t);
+			}
+		}
+		for(TradeItem t: acceptedTrades.keySet()) {
+			if (t.getProposer().getId() == accountId || t.getReciever().getId() == accountId) {
+				items.add(t);
+			}
+		}
+		return items;
+	}
+
+
+	@Override
 	public List<TradeItem> getDeclinedTrades(long accountId) {
 		ArrayList<TradeItem> items = new ArrayList<>();
 		for(TradeItem i: declinedTrades) {

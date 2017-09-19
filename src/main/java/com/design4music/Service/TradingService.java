@@ -72,6 +72,10 @@ public class TradingService {
 		return tradingDAO.getUnhandledAcceptedTrades(accountId);
 	}
 
+	public List<TradeItem> getAllTradeResponses(long accountId) {
+		return tradingDAO.getAllTradeResponses(accountId);
+	}
+
 	public List<TradeItem> getDeclinesTrades(long accountId) {
 		return tradingDAO.getDeclinedTrades(accountId);
 	}
