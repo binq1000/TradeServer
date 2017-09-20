@@ -2,6 +2,7 @@ package com.design4music.Rest;
 
 import com.design4music.Domain.TradeItem;
 import com.design4music.Service.TradingService;
+import com.design4music.Service.TradingServiceJpa;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -19,10 +20,10 @@ import java.util.List;
 @RequestMapping("/trade")
 public class TradingRest {
 
-	private TradingService service;
+	private TradingServiceJpa service;
 
 
-	public TradingRest(TradingService service) {
+	public TradingRest(TradingServiceJpa service) {
 		this.service = service;
 	}
 

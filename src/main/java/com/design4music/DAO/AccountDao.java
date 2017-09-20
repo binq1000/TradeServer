@@ -19,11 +19,17 @@ public class AccountDao implements IAccountDao {
 	@Override
 	public Account getAccount(long id) {
 		Account acc = null;
-		for(Account a: accounts) {
-			if (a.getId() == id) {
-				acc = a;
+		try {
+			for(Account a: accounts) {
+				if (a.getId() == id) {
+					acc = a;
+				}
 			}
 		}
+		catch (NullPointerException e) {
+			System.out.println("NullPointer encountered: " + e.getMessage());
+		}
+
 		return acc;
 	}
 
@@ -35,7 +41,10 @@ public class AccountDao implements IAccountDao {
 	@Override
 	public Account createAccount() {
 		Account account = new Account(getNextAccountId());
-		accounts.add(account);
+		if (account != null)
+		{
+			accounts.add(account);
+		}
 		return account;
 	}
 
@@ -62,7 +71,7 @@ public class AccountDao implements IAccountDao {
 	private long getNextAccountId() {
 		long highest = 0;
 		for(Account a: accounts) {
-			if (a.getId() >= highest) {
+			if (a != null && a.getId() >= highest) {
 				highest = a.getId() + 1;
 			}
 		}

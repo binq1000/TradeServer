@@ -2,6 +2,7 @@ package com.design4music.Rest;
 
 import com.design4music.Domain.Account;
 import com.design4music.Service.AccountService;
+import com.design4music.Service.AccountServiceJpa;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,9 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/account")
 public class AccountRest {
-	AccountService service;
+	AccountServiceJpa service;
 
-	public AccountRest(AccountService service) {
+	public AccountRest(AccountServiceJpa service) {
 		this.service = service;
 	}
 
