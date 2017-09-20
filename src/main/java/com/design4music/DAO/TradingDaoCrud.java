@@ -11,4 +11,5 @@ import java.util.List;
 public interface TradingDaoCrud extends CrudRepository<TradeItem, Long> {
 	List<TradeItem> findAllByProposerId(long id);
 	List<TradeItem> findAllByRecieverId(long id);
+	List<TradeItem> findAllByResponseAndProposerIdAndHandled(int response, long accountId, boolean handled);
 }

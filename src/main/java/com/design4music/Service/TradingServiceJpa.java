@@ -59,7 +59,13 @@ public class TradingServiceJpa {
 	}
 
 	public List<TradeItem> getUnhandledAcceptedTrades(long accountId) {
-		return null; //return tradingDao.getUnhandledAcceptedTrades(accountId);
+		List<TradeItem> items = Lists.newArrayList(tradingDao.findAllByResponseAndProposerIdAndHandled(1, accountId, false));
+		for(TradeItem t: items) {
+			t.setHandled(true);
+			tradingDao.save(t);
+		}
+		return items;
+		//return tradingDao.getUnhandledAcceptedTrades(accountId);
 	}
 
 	public List<TradeItem> getAllTradeResponses(long accountId) {
@@ -71,7 +77,10 @@ public class TradingServiceJpa {
 	}
 
 	public void respondToTrade(long tradeId, boolean response) {
-		//tradingDao.respondToTrade(tradeId, response);
+		TradeItem item = tradingDao.findOne(tradeId);
+		int res = response ? 1 : 0;
+		item.setResponse(res);
+		tradingDao.save(item);
 	}
 
 }

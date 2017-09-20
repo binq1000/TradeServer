@@ -23,6 +23,11 @@ public class TradeItem {
 	@OneToOne
 	private Flippo receiverFlippo;
 
+	//0 = Declines, 1= Accepted >1 = No response
+	private int response;
+
+	private boolean handled;
+
 	protected TradeItem() {
 		//For JPA
 	}
@@ -40,6 +45,8 @@ public class TradeItem {
 		this.proposerFlippo = proposerFlippo;
 		this.reciever = reciever;
 		this.receiverFlippo = receiverFlippo;
+		this.response = 2;
+		this.handled = false;
 	}
 
 	public long getId() {
@@ -80,5 +87,21 @@ public class TradeItem {
 
 	public void setReceiverFlippo(Flippo receiverFlippo) {
 		this.receiverFlippo = receiverFlippo;
+	}
+
+	public int getResponse() {
+		return response;
+	}
+
+	public void setResponse(int response) {
+		this.response = response;
+	}
+
+	public boolean isHandled() {
+		return handled;
+	}
+
+	public void setHandled(boolean handled) {
+		this.handled = handled;
 	}
 }
