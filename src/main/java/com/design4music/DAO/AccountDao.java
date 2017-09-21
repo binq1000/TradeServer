@@ -43,7 +43,7 @@ public class AccountDao implements IAccountDao {
 	public Account createAccount(long id) {
 		//Check if account already exists.
 		for(Account a: accounts) {
-			if (a.getId() == id) {
+			if (a != null && a.getId() == id) {
 				throw new IllegalArgumentException("id already exists");
 			}
 		}
@@ -62,7 +62,7 @@ public class AccountDao implements IAccountDao {
 	private long getNextAccountId() {
 		long highest = 0;
 		for(Account a: accounts) {
-			if (a.getId() >= highest) {
+			if (a != null && a.getId() >= highest) {
 				highest = a.getId() + 1;
 			}
 		}
