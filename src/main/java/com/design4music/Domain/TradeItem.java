@@ -10,11 +10,10 @@ public class TradeItem {
 	private Account reciever;
 	private Flippo receiverFlippo;
 
-	public TradeItem(long id, Account proposer, Flippo proposerFlippo, Account reciever, Flippo receiverFlippo) {
+	public TradeItem(long id, Account proposer, Flippo proposerFlippo, Flippo receiverFlippo) {
 		this.id = id;
 		this.proposer = proposer;
 		this.proposerFlippo = proposerFlippo;
-		this.reciever = reciever;
 		this.receiverFlippo = receiverFlippo;
 	}
 
@@ -40,14 +39,6 @@ public class TradeItem {
 
 	public void setProposerFlippo(Flippo proposerFlippo) {
 		this.proposerFlippo = proposerFlippo;
-	}
-
-	public Account getReciever() {
-		return reciever;
-	}
-
-	public void setReciever(Account reciever) {
-		this.reciever = reciever;
 	}
 
 	public Flippo getReceiverFlippo() {

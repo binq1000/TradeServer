@@ -1,9 +1,14 @@
 package com.design4music.DAO;
 
+import com.design4music.Domain.AcceptedTradeItem;
 import com.design4music.Domain.Account;
 import com.design4music.Domain.Flippo;
 import com.design4music.Domain.TradeItem;
 
+import javax.annotation.PreDestroy;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.*;
 
 /**
@@ -12,7 +17,7 @@ import java.util.*;
 public class TradingDao implements ITradingDao{
 
 	List<TradeItem> tradeItemList;
-	HashMap<TradeItem, Boolean> acceptedTrades;
+	HashMap<AcceptedTradeItem, Boolean> acceptedTrades;
 	List<TradeItem> declinedTrades;
 
 	public TradingDao() {
@@ -20,6 +25,8 @@ public class TradingDao implements ITradingDao{
 		acceptedTrades = new HashMap<>();
 		declinedTrades = new ArrayList<>();
 	}
+
+
 
 	@Override
 	public TradeItem getTradeItem(long id) {
@@ -46,8 +53,8 @@ public class TradingDao implements ITradingDao{
 	}
 
 	@Override
-	public TradeItem createTradeItem(Account proposer, Flippo proposerFlippo, Account receiver, Flippo receiverFlippo) {
-		TradeItem item = new TradeItem(tradeItemList.size(), proposer, proposerFlippo, receiver, receiverFlippo);
+	public TradeItem createTradeItem(Account proposer, Flippo proposerFlippo, Flippo receiverFlippo) {
+		TradeItem item = new TradeItem(tradeItemList.size(), proposer, proposerFlippo, receiverFlippo);
 		tradeItemList.add(item);
 		return item;
 	}
@@ -66,19 +73,17 @@ public class TradingDao implements ITradingDao{
 	@Override
 	public List<TradeItem> getTradesForAccount(long accountId) {
 		ArrayList<TradeItem> items = new ArrayList<>();
-		for (TradeItem i: tradeItemList) {
-			if (i.getReciever().getId() == accountId) {
-				items.add(i);
-			}
-		}
+		//TODO write logic.
 		return items;
 	}
 
 	@Override
-	public List<TradeItem> getUnhandledAcceptedTrades(long accountId) {
-		ArrayList<TradeItem> items = new ArrayList<>();
-		for(Map.Entry<TradeItem, Boolean> entry: acceptedTrades.entrySet()) {
-			if (!entry.getValue() && entry.getKey().getProposer().getId() == accountId) {
+	public List<AcceptedTradeItem> getUnhandledAcceptedTrades(long accountId) {
+		ArrayList<AcceptedTradeItem> items = new ArrayList<>();
+
+		for(Map.Entry<AcceptedTradeItem, Boolean> entry: acceptedTrades.entrySet()) {
+			TradeItem item = entry.getKey().getTradeItem();
+			if (!entry.getValue() && entry.getKey() != null && item.getProposer() != null && item.getProposer().getId() == accountId) {
 				items.add(entry.getKey());
 				entry.setValue(true);
 			}
@@ -88,19 +93,27 @@ public class TradingDao implements ITradingDao{
 	}
 
 	@Override
-	public List<TradeItem> getAllTradeResponses(long accountId) {
+	public Map<String,List<TradeItem>> getAllTradeResponses(long accountId) {
 		List<TradeItem> items = new ArrayList<>();
-		for(TradeItem t: declinedTrades) {
-			if (t.getProposer().getId() == accountId || t.getReciever().getId() == accountId) {
-				items.add(t);
+		Map<String, List<TradeItem>> response = new HashMap<>();
+
+		for(Map.Entry<AcceptedTradeItem, Boolean> entry: acceptedTrades.entrySet()) {
+			TradeItem item = entry.getKey().getTradeItem();
+
+			//All trade where you are the receiver
+			if (entry.getKey().getReceiver().getId() == accountId) {
+				items.add(new TradeItem(item.getId(), entry.getKey().getReceiver(), item.getReceiverFlippo(), item.getProposerFlippo()));
+			}
+
+			//All trades where you are the proposer.
+			if (item.getProposer() != null && item.getProposer().getId() == accountId) {
+				items.add(entry.getKey().getTradeItem());
 			}
 		}
-		for(TradeItem t: acceptedTrades.keySet()) {
-			if (t.getProposer().getId() == accountId || t.getReciever().getId() == accountId) {
-				items.add(t);
-			}
-		}
-		return items;
+
+		response.put("accepted", items);
+		response.put("pending", getTradesFromAccount(accountId));
+		return response;
 	}
 
 
@@ -118,8 +131,9 @@ public class TradingDao implements ITradingDao{
 
 
 	@Override
-	public void respondToTrade(long tradeItemId, boolean response) {
+	public void respondToTrade(long tradeItemId, Account receiver, boolean response) {
 		TradeItem item = null;
+
 		for(TradeItem i: tradeItemList) {
 			if (i.getId() == tradeItemId) {
 				item = i;
@@ -128,11 +142,26 @@ public class TradingDao implements ITradingDao{
 		}
 
 		tradeItemList.remove(item);
+		AcceptedTradeItem acceptedTradeItem = new AcceptedTradeItem(item, receiver);
 
 		if (response) {
-			acceptedTrades.put(item, false);
+			acceptedTrades.put(acceptedTradeItem, false);
 		} else {
 			declinedTrades.add(item);
 		}
+	}
+
+	@Override
+	public void removeFromList(long tradeItemId) {
+		TradeItem item = null;
+
+		for(TradeItem i: tradeItemList) {
+			if (i.getId() == tradeItemId) {
+				item = i;
+				break;
+			}
+		}
+
+		tradeItemList.remove(item);
 	}
 }

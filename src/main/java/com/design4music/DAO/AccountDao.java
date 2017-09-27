@@ -2,6 +2,9 @@ package com.design4music.DAO;
 
 import com.design4music.Domain.Account;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +17,7 @@ public class AccountDao implements IAccountDao {
 
 	public AccountDao() {
 		accounts = new ArrayList<>();
+		readId();
 	}
 
 	@Override
@@ -36,6 +40,7 @@ public class AccountDao implements IAccountDao {
 	public Account createAccount() {
 		Account account = new Account(getNextAccountId());
 		accounts.add(account);
+		writeId();
 		return account;
 	}
 
@@ -51,6 +56,7 @@ public class AccountDao implements IAccountDao {
 		//Create the account
 		Account account = new Account(id);
 		accounts.add(account);
+		writeId();
 		return account;
 	}
 
@@ -67,5 +73,36 @@ public class AccountDao implements IAccountDao {
 			}
 		}
 		return highest;
+	}
+
+
+
+	private void writeId() {
+		try {
+			Writer writer = new FileWriter("accountid.txt");
+			writer.write(String.valueOf(accounts.size()));
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void readId() {
+		try {
+			Reader reader = new FileReader("accountid.txt");
+			BufferedReader bufferedReader =
+					new BufferedReader(reader);
+			String line = "";
+			while((line = bufferedReader.readLine()) != null) {
+				int i = Integer.parseInt(line);
+				createAccount(i);
+			}
+
+			// Always close files.
+			bufferedReader.close();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

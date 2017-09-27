@@ -1,10 +1,12 @@
 package com.design4music.DAO;
 
+import com.design4music.Domain.AcceptedTradeItem;
 import com.design4music.Domain.Account;
 import com.design4music.Domain.Flippo;
 import com.design4music.Domain.TradeItem;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Nekkyou on 18-9-2017.
@@ -30,11 +32,10 @@ public interface ITradingDao {
 	 * Create a tradeitem with the base values.
 	 * @param proposer		 : The account that started the trade
 	 * @param proposerFlippo : The flippo that the proposer is offering
-	 * @param receiver		 : The one that is receiving the trade offer.
 	 * @param receiverFlippo : The flippo that the proposer want.
 	 * @return The trade item.
 	 */
-	TradeItem createTradeItem(Account proposer, Flippo proposerFlippo, Account receiver, Flippo receiverFlippo);
+	TradeItem createTradeItem(Account proposer, Flippo proposerFlippo, Flippo receiverFlippo);
 
 	/**
 	 * Get all the trades that this account has made.
@@ -55,9 +56,9 @@ public interface ITradingDao {
 	 * @param accountId The id of the proposer of the trade
 	 * @return a list of all the trades that the proposer made that have been accepted and not yet handles.
 	 */
-	List<TradeItem> getUnhandledAcceptedTrades(long accountId);
+	List<AcceptedTradeItem> getUnhandledAcceptedTrades(long accountId);
 
-	List<TradeItem> getAllTradeResponses(long accountId);
+	Map<String,List<TradeItem>> getAllTradeResponses(long accountId);
 
 	/**
 	 * Get all declined trades from an account.
@@ -70,5 +71,7 @@ public interface ITradingDao {
 	 * Respond to a trade.
 	 * @param response If the user wishes to accept or reject the trade.
 	 */
-	void respondToTrade(long tradeItemId, boolean response);
+	void respondToTrade(long tradeItemId, Account receiver, boolean response);
+
+	void removeFromList(long tradeItemId);
 }

@@ -2,6 +2,8 @@ package com.design4music.Service;
 
 import com.design4music.DAO.ITradingDao;
 import com.design4music.DAO.TradingDao;
+import com.design4music.DataViz.AccountTrades;
+import com.design4music.Domain.AcceptedTradeItem;
 import com.design4music.Domain.Account;
 import com.design4music.Domain.Flippo;
 import com.design4music.Domain.TradeItem;
@@ -9,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Nekkyou on 18-9-2017.
@@ -38,7 +40,7 @@ public class TradingService {
 		return tradingDAO.getAllTrades();
 	}
 
-	public TradeItem createTradeItem(long proposerId, long proposerFlippoId, long receiverId, long receiverFlippoId) {
+	public TradeItem createTradeItem(long proposerId, long proposerFlippoId, long receiverFlippoId) {
 		Account proposer = accountService.getAccount(proposerId);
 
 		//TODO : Remove this code later.
@@ -47,16 +49,27 @@ public class TradingService {
 		}
 
 		Flippo proposerFlippo = new Flippo(proposerFlippoId);
-		Account receiver = accountService.getAccount(receiverId);
-
-		//TODO : Remove this code later.
-		if (receiver == null) {
-			receiver = accountService.createAccount(receiverId);
-		}
-
 		Flippo receiverFlippo = new Flippo(receiverFlippoId);
 
-		return tradingDAO.createTradeItem(proposer, proposerFlippo, receiver, receiverFlippo);
+		return tradingDAO.createTradeItem(proposer, proposerFlippo, receiverFlippo);
+	}
+
+	public TradeItem checkAlt(TradeItem item) {
+		System.out.println("New PfId: " + item.getProposerFlippo().getId() + "; New RfId: " + item.getReceiverFlippo().getId());
+		TradeItem tradeItem = null;
+
+		List<TradeItem> items = tradingDAO.getAllTrades();
+		for(TradeItem t: items) {
+			System.out.println("PfId: " + t.getProposerFlippo().getId() + "; RfId: " + t.getReceiverFlippo().getId());
+			if (t.getProposerFlippo().getId() == item.getReceiverFlippo().getId() && t.getReceiverFlippo().getId() == item.getProposerFlippo().getId()) {
+				tradeItem = t;
+				tradingDAO.respondToTrade(t.getId(), item.getProposer(), true);
+				tradingDAO.removeFromList(item.getId());
+				break;
+			}
+		}
+
+		return tradeItem;
 	}
 
 
@@ -68,11 +81,11 @@ public class TradingService {
 		return tradingDAO.getTradesForAccount(accountId);
 	}
 
-	public List<TradeItem> getUnhandledAcceptedTrades(long accountId) {
+	public List<AcceptedTradeItem> getUnhandledAcceptedTrades(long accountId) {
 		return tradingDAO.getUnhandledAcceptedTrades(accountId);
 	}
 
-	public List<TradeItem> getAllTradeResponses(long accountId) {
+	public Map<String,List<TradeItem>> getAllTradeResponses(long accountId) {
 		return tradingDAO.getAllTradeResponses(accountId);
 	}
 
@@ -81,7 +94,39 @@ public class TradingService {
 	}
 
 	public void respondToTrade(long tradeId, boolean response) {
-		tradingDAO.respondToTrade(tradeId, response);
+//		tradingDAO.respondToTrade(tradeId, response);
+	}
+
+	public List<AccountTrades> getTradesPerAccount() {
+		List<AccountTrades> items = new ArrayList<>();
+
+		for(Account a: accountService.getAllAccounts()) {
+			List<TradeItem> tradedItems = new ArrayList<>();
+			Map<String, List<TradeItem>> trades = getAllTradeResponses(a.getId());
+			for(Map.Entry<String, List<TradeItem>> trade : trades.entrySet()) {
+				tradedItems.addAll(trade.getValue());
+			}
+			items.add(new AccountTrades(a, tradedItems));
+		}
+
+		return items;
+	}
+
+
+	public void createTestData() {
+		int minFlippoId = 1;
+		int maxFlippoId = 30 + 1;
+
+		if (tradingDAO.getAllTrades().size() < 5000) {
+			for(int i=0; i <30; i++) {
+				Random random = new Random();
+				int accountId = random.ints(0, 301).findFirst().getAsInt();
+				int flippo1 = random.ints(minFlippoId, maxFlippoId).findFirst().getAsInt();
+				int flippo2 = random.ints(minFlippoId, maxFlippoId).findFirst().getAsInt();
+				createTradeItem(accountId, flippo1, flippo2);
+			}
+		}
+
 	}
 
 }
